@@ -32,12 +32,24 @@ orderController.getOrder = async (req, res) => {
                 return {
                     id: order.id_order_product,
                     id_product: order.id_product,
+                    name: '',
+                    image: '',
                     quantity: order.quantity,
                     price: order.price,
                     subtotal: order.subtotal,
                     iva: order.iva,
                     total: order.total,
                 }
+            })
+            orders.forEach(order => {
+                pool.query('SELECT * FROM `producto` WHERE id_product = ?', [order.id_product], (err, rows) => {
+                    if (err) {
+                        res.json(err);
+                    } else {
+                        order.name = rows[0].name;
+                        order.image = Buffer.from(rows[0].image).toString('base64');
+                    }
+                })
             })
             res.render('orders/details', { data: orders })
         }

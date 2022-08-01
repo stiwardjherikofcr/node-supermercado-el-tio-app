@@ -25,7 +25,8 @@
                             <thead>
                                 <tr>
                                     <th scope="col">ID</th>
-                                    <th scope="col">ID Producto</th>
+                                    <th scope="col">Imagen</th>
+                                    <th scope="col">Producto</th>
                                     <th scope="col">Quantity</th>
                                     <th scope="col">Price</th>
                                     <th scope="col">Subtotal</th>
@@ -37,7 +38,8 @@
                                 {{#each data}}
                                 <tr>
                                     <th scope="row">{{id}}</th>
-                                    <td>{{id_product}}</td>
+                                    <td><img src="data:image/jpeg;base64,{{image}}" alt="{{name}}" class="img-fluid" width="100"></td>
+                                    <td>{{name}}</td>
                                     <td>{{quantity}}</td>
                                     <td>$ {{price}}</td>
                                     <td>$ {{subtotal}}</td>
