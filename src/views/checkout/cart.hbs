@@ -49,8 +49,8 @@
                                         <span class="float-right font-weight-bold" id="subtotal"></span>
                                     </p>
                                     <p class="card-text">
-                                        <span>Envio:</span>
-                                        <span class="float-right">$0</span>
+                                        <span id="tax"></span>
+                                        <span class="float-right" id="iva"></span>
                                     </p>
                                     <p class="card-text">
                                         <span class="h5">Total:</span>
@@ -60,7 +60,7 @@
                             </div>
                         </div>
                         <div class="card-footer">
-                            <a href="{{#if user}}/orders{{else}}/auth/signin{{/if}}" class="btn btn-lg btn-block" style="color: #fff; background-color:#042577;">Pagar</a>
+                            <button class="btn btn-lg btn-block" onclick="checkout()" style="color: #fff; background-color:#042577;">Pagar</button>
                             <a href="/products/products_list" class="btn btn-outline-primary btn-lg btn-block">Seguir Comprando</a>
                         </div>
                     </div>

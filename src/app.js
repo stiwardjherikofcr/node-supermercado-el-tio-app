@@ -17,6 +17,7 @@ const accountRoutes = require('./routes/account.routes');
 const userRoutes = require('./routes/user.routes');
 const productRoutes = require('./routes/product.routes');
 const orderRoutes = require('./routes/order.routes');
+const ivaRoutes = require('./routes/iva.routes');
 
 // Intializations 
 const app = express();
@@ -29,7 +30,7 @@ app.engine('.hbs', exphbs.engine({
     defaultLayout: 'main',
     layoutsDir: path.join(app.get('views'), 'layouts'),
     partialsDir: path.join(app.get('views'), 'partials'),
-    extname: '.hbs', 
+    extname: '.hbs',
     helpers: require('./helpers/timeago')
 }));
 app.set('view engine', '.hbs');
@@ -37,7 +38,7 @@ app.set('view engine', '.hbs');
 // Middlewares
 app.use(morgan('dev'));
 app.use(express.urlencoded({ extended: false }));
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
 
 app.use(session({
     secret: 'secret',
@@ -65,6 +66,7 @@ app.use('/account', accountRoutes);
 app.use('/users', userRoutes);
 app.use('/products', productRoutes);
 app.use('/orders', orderRoutes);
+app.use('/iva', ivaRoutes);
 
 // Static Files
 app.use(express.static(path.join(__dirname, 'public')))

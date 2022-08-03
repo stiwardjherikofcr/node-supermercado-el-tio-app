@@ -58,8 +58,47 @@ orderController.getOrder = async (req, res) => {
 
 
 orderController.createOrder = async (req, res) => {
+    const id_customer = req.user.id_customer;
+    const date = new Date();
+    const subtotal = req.body.subtotal;
+    const iva = req.body.iva;
+    const total = req.body.total;
+    const order = {
+        id_customer,
+        date,
+        subtotal,
+        iva,
+        total,
+    }
+    await pool.query('INSERT INTO `order` SET ?', [order], (err, rows) => {
+        if (err) {
+            res.json(err);
+        } else {
+            id_order = rows.insertId;
+            orderController.createOrderProducts(req, res, id_order, req.body.products);
+            res.redirect('/orders');
+        }
+    })
 }
 
+orderController.createOrderProducts = async (req, res, id_order, products) => {
+    products.forEach(product => {
+        const order_product = {
+            id_order,
+            id_product: product.id,
+            quantity: product.quantity,
+            price: product.price,
+            subtotal: product.subtotal,
+            iva: product.iva,
+            total: product.total,
+        }
+        pool.query('INSERT INTO `order_producto` SET ?', [order_product], (err, rows) => {
+            if (err) {
+                res.json(err);
+            }
+        })
+    })
+}
 
 orderController.getOrdersAdmin = (req, res) => {
     console.log('getOrdersAdmin');

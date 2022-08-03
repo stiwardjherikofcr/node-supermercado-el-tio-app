@@ -1,5 +1,6 @@
-const API_URL = "http://" + window.location.hostname + ":3000/products/add_cart/";
+const BASE_URL = `http://${window.location.hostname}:${window.location.port}`;
 let cart = (existsCart()) ? JSON.parse(localStorage.getItem('cart')) : [];
+let iva = 0;
 
 /**
  * funcion para los options de fetch 
@@ -34,7 +35,7 @@ function existsCart() {
 }
 
 function addToCart(id) {
-  const url = API_URL + id;
+  const url = `${BASE_URL}/products/add_cart/${id}`;
   leerJSON(url).then(data => {
     addToLocalStorage(data);
   }).catch(error => {
@@ -52,7 +53,9 @@ function addToLocalStorage(product) {
     if (item.id === product.id) {
       productExists = true;
       item.quantity += 1;
-      item.totalPrice = item.quantity * item.price;
+      item.subtotal = item.quantity * item.price;
+      item.iva = item.subtotal * (iva / 100);
+      item.total = item.subtotal + item.iva;
     }
   });
   if (!productExists) {
@@ -119,7 +122,9 @@ function setQuantity(id, quantity, stock) {
     if (item.id === id) {
       if (quantity > 0 && quantity <= stock) {
         item.quantity = quantity;
-        item.totalPrice = item.quantity * item.price;
+        item.subtotal = item.quantity * item.price;
+        item.iva = item.subtotal * (iva / 100);
+        item.total = item.subtotal + item.iva;
       }
     }
   });
@@ -134,10 +139,11 @@ function removeFromCart(id) {
 
 function totalPrice() {
   const total = cart.reduce((acc, curr) => {
-    return acc + curr.totalPrice;
+    return acc + curr.subtotal;
   }, 0);
   document.getElementById('subtotal').innerHTML = `$ ${integerToFloatWithComma(total)}`;
-  document.getElementById('total_price').innerHTML = `$ ${integerToFloatWithComma(total)}`;
+  document.getElementById('iva').innerHTML = `$ ${integerToFloatWithComma(total * (iva / 100))}`;
+  document.getElementById('total_price').innerHTML = `$ ${integerToFloatWithComma(total + (total * (iva / 100)))}`;
 }
 
 function addCartToLocalStorage() {
@@ -152,3 +158,45 @@ function getSizeCart() {
 function integerToFloatWithComma(number) {
   return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
+
+function checkout() {
+  const url = `${BASE_URL}/orders/new/`;
+  const data = {
+    products: cart,
+    subtotal: Number(document.getElementById('subtotal').innerHTML.replace(/[^0-9\.]+/g, "")),
+    iva: iva,
+    total: Number(document.getElementById('total_price').innerHTML.replace(/[^0-9\.]+/g, ""))
+  };
+  console.log(data);
+  fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
+  }).then(response => {
+    if (response.status === 200) {
+      alert('Su pedido se ha enviado correctamente');
+      localStorage.removeItem('cart');
+      cart = [];
+      getCart();
+    } else {
+      alert('Error al enviar el pedido');
+    }
+  }).catch(error => {
+    console.log(error);
+  });
+}
+
+function getIva() {
+  const url = `${BASE_URL}/iva/`;
+  fetch(url)
+    .then(res => res.json())
+    .then(data => {
+      iva = data;
+      document.getElementById('tax').innerText = `IVA(${data}%):`;
+    })
+    .catch(err => console.error(err));
+}
+
+getIva();

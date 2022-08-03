@@ -37,11 +37,12 @@ productController.addToCart = async (req, res) => {
                 return {
                     id: product.id_product,
                     name: product.name,
-                    category: product.id_category,
                     stock: product.stock,
                     quantity: 1,
                     price: product.price,
-                    totalPrice: product.price,
+                    subtotal: product.price,
+                    iva: product.price * (19 / 100),
+                    total: product.price * 1.19,
                     image: Buffer.from(product.image).toString('base64')
                 }
             })
